@@ -1,161 +1,298 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Bemo🤖ระบาด!</title>
-<style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07120a;font-family:Arial,sans-serif;touch-action:none}
-#game{position:fixed;inset:0}canvas{display:block}
-#intro{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(#f7c74b,#8bcf62);z-index:10;transition:opacity 1.2s}
-#intro h1{font-size:clamp(42px,12vw,90px);margin:0 0 30px;color:#fff;text-shadow:4px 5px 0 #263c2b}
-#play{font-size:26px;font-weight:bold;padding:15px 48px;border:0;border-radius:16px;background:#fff;box-shadow:0 7px 0 #4d6b42;color:#263c2b}
-#hud{position:fixed;inset:0;pointer-events:none;color:white;z-index:3}
-#cross{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%)}
-#cross:before,#cross:after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}
-#cross:before{width:28px;height:3px;top:12px;left:0}.#cross:after{width:3px;height:28px;left:12px;top:0}
-#info{position:absolute;top:12px;left:12px;background:#0008;padding:9px 12px;border-radius:10px}
-#health{position:absolute;top:12px;right:12px;background:#0008;padding:9px 12px;border-radius:10px}
-#shoot{position:absolute;right:22px;bottom:35px;width:92px;height:92px;border-radius:50%;border:3px solid #fff8;background:#d22;color:#fff;font-size:20px;font-weight:bold;pointer-events:auto}
-#joy{position:absolute;left:25px;bottom:35px;width:130px;height:130px;border-radius:50%;background:#ffffff20;border:2px solid #fff6;pointer-events:auto}
-#knob{position:absolute;width:55px;height:55px;left:35px;top:35px;border-radius:50%;background:#ffffff66}
-#hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;background:#0006;padding:5px 8px;border-radius:8px}
-#dead{display:none;position:fixed;inset:0;z-index:9;background:#0009;color:#fff;align-items:center;justify-content:center;flex-direction:column}
-#dead button{padding:12px 28px;font-size:20px;border:0;border-radius:12px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แก๊งเรามันสุดยอด - Friendship Roast Room</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #login-screen {
+            background: rgba(20, 20, 35, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        h1 {
+            color: #00ffff;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+
+        p {
+            color: #b2bec3;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #00d2d3;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.6);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00d2d3, #0097e6);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0,151,230,0.4);
+            transition: 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        #main-screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(241,196,15,0.4);
+        }
+
+        .friends-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .friend-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .friend-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ffff;
+            box-shadow: 0 8px 25px rgba(0,240,255,0.4);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        .friend-card h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #ff9f43;
+        }
+
+        #message-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e1e2f, #2d2b4e);
+            border: 2px solid #ff4757;
+            padding: 25px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: #ff4757;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .modal-content p {
+            color: #f1f2f6;
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 20px 0;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #ff4757;
+        }
+
+        .close-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255,71,87,0.4);
+            transition: 0.2s;
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-<div id="game"></div>
-<div id="intro"><h1>Bemo🤖ระบาด!</h1><button id="play">PLAY</button></div>
-<div id="hud" style="display:none">
-  <div id="info">👾 Bemo ที่กำจัด: <b id="score">0</b></div>
-  <div id="health">🔫 กระสุน: ∞</div>
-  <div id="cross"></div>
-  <div id="hint">ลากวงกลมซ้ายเพื่อเดิน • ลากหน้าจอเพื่อหัน • กด SHOOT เพื่อยิง</div>
-  <div id="joy"><div id="knob"></div></div>
-  <button id="shoot">SHOOT</button>
-</div>
-<div id="dead"><h1>เกมจบ!</h1><p>โดน Bemo เล่นงานแล้ว 😵</p><button onclick="location.reload()">เล่นใหม่</button></div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script>
-let scene,camera,renderer,clock,started=false,score=0;
-let player={x:0,z:0,yaw:0,pitch:-0.05};
-let enemies=[],move={x:0,y:0},drag=false,lastX=0,lastY=0,shotCooldown=0;
 
-const $=id=>document.getElementById(id);
-function mat(c){return new THREE.MeshStandardMaterial({color:c,roughness:.8});}
-function box(w,h,d,c){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));return m;}
-function cyl(r,h,c){return new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,12),mat(c));}
+    <div class="container">
+        <!-- หน้าจอใส่ชื่อ -->
+        <div id="login-screen">
+            <h1>✨ Gang of Friends ✨</h1>
+            <p>กรอกชื่อของคุณก่อนเข้าไปส่องเพื่อนซี้!</p>
+            <input type="text" id="username-input" placeholder="พิมพ์ชื่อของคุณที่นี่...">
+            <button class="btn" onclick="enterApp()">เข้าสู่ระบบ 🚀</button>
+        </div>
 
-function makeEnemy(){
-  const g=new THREE.Group();
-  // body like the supplied Bemo image, built from simple 3D shapes
-  let body=box(1.25,1.65,.85,0x8fb49a); body.position.y=1.65; g.add(body);
-  let screen=box(.95,.7,.05,0xdaf0d0); screen.position.set(0,1.95,.44); g.add(screen);
-  let eye1=cyl(.055,.025,0x111111); eye1.rotation.x=Math.PI/2; eye1.position.set(-.24,2.08,.48);g.add(eye1);
-  let eye2=eye1.clone();eye2.position.x=.24;g.add(eye2);
-  let mouth=box(.35,.07,.035,0x111111);mouth.position.set(0,1.82,.48);g.add(mouth);
-  let arm1=box(.18,1.05,.18,0x6c927e);arm1.position.set(-.76,1.35,0);g.add(arm1);
-  let arm2=arm1.clone();arm2.position.x=.76;g.add(arm2);
-  let leg1=box(.22,.85,.22,0x587a7d);leg1.position.set(-.32,.42,0);g.add(leg1);
-  let leg2=leg1.clone();leg2.position.x=.32;g.add(leg2);
-  let red=box(.24,.28,.06,0xe51c32);red.position.set(.22,1.27,.46);g.add(red);
-  let green=cyl(.12,.06,0x23d94b);green.rotation.x=Math.PI/2;green.position.set(.42,1.42,.46);g.add(green);
-  let blue=cyl(.12,.06,0x2cb8e8);blue.rotation.x=Math.PI/2;blue.position.set(0,1.42,.46);g.add(blue);
-  g.userData.hp=5; g.userData.hitFlash=0;
-  return g;
-}
-function spawnEnemy(){
-  const e=makeEnemy();
-  const a=Math.random()*Math.PI*2, d=18+Math.random()*28;
-  e.position.set(player.x+Math.sin(a)*d,0,player.z+Math.cos(a)*d);
-  scene.add(e);enemies.push(e);
-}
-function init(){
- scene=new THREE.Scene();
- scene.background=new THREE.Color(0x91c95b);
- scene.fog=new THREE.Fog(0x91c95b,35,100);
- camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.05,200);
- renderer=new THREE.WebGLRenderer({antialias:true});
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);
- $('game').appendChild(renderer.domElement);
- clock=new THREE.Clock();
- scene.add(new THREE.HemisphereLight(0xffffdd,0x35552e,2.2));
- let sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(20,40,10);scene.add(sun);
- // endless-looking grass
- const ground=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshStandardMaterial({color:0x3c9b3e}));
- ground.rotation.x=-Math.PI/2;scene.add(ground);
- // scattered grass/trees for depth
- for(let i=0;i<180;i++){
-   let x=(Math.random()-.5)*190,z=(Math.random()-.5)*190;
-   if(Math.hypot(x,z)<8)continue;
-   let trunk=cyl(.15,.8,0x65452a);trunk.position.set(x,.4,z);scene.add(trunk);
-   let crown=cyl(.7,1.6,0x247a36);crown.position.set(x,1.45,z);scene.add(crown);
- }
- for(let i=0;i<4;i++)spawnEnemy();
- animate();
-}
-function shoot(){
- if(!started||shotCooldown>0)return;shotCooldown=.25;
- const ray=new THREE.Raycaster();
- ray.setFromCamera(new THREE.Vector2(0,0),camera);
- const hits=ray.intersectObjects(enemies,true);
- if(!hits.length)return;
- let o=hits[0].object;
- while(o.parent&&!o.userData.hp)o=o.parent;
- if(!o.userData.hp)return;
- o.userData.hp--;o.userData.hitFlash=.12;
- if(o.userData.hp<=0){
-   scene.remove(o);enemies=enemies.filter(x=>x!==o);score++;$('score').textContent=score;setTimeout(spawnEnemy,500);
- }
-}
-function update(dt){
- shotCooldown=Math.max(0,shotCooldown-dt);
- player.yaw-=move.x*dt*2.8;
- let speed=6;
- let fwd=move.y*speed*dt, side=move.x*speed*dt*.35;
- player.x+=Math.sin(player.yaw)*fwd+Math.cos(player.yaw)*side;
- player.z+=Math.cos(player.yaw)*fwd-Math.sin(player.yaw)*side;
- camera.position.set(player.x,1.7,player.z);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
- for(let e of enemies){
-   let dx=player.x-e.position.x,dz=player.z-e.position.z,d=Math.hypot(dx,dz);
-   if(d>1.5){e.position.x+=dx/d*dt*1.8;e.position.z+=dz/d*dt*1.8;}
-   e.lookAt(player.x,e.position.y,player.z);
-   if(e.userData.hitFlash>0){e.userData.hitFlash-=dt;e.children[0].material.emissive=new THREE.Color(0xff4444);e.children[0].material.emissiveIntensity=.7}else{e.children[0].material.emissiveIntensity=0}
-   if(d<1.35){ $('dead').style.display='flex';started=false; }
- }
-}
-function animate(){requestAnimationFrame(animate);let dt=Math.min(clock.getDelta(),.05);if(started)update(dt);renderer.render(scene,camera);}
-$('play').onclick=()=>{started=true;$('intro').style.opacity=0;setTimeout(()=>$('intro').style.display='none',1200);$('hud').style.display='block';};
-$('shoot').addEventListener('pointerdown',e=>{e.preventDefault();shoot()});
-$('joy').addEventListener('pointerdown',e=>{drag=true;updateJoy(e)});
-window.addEventListener('pointermove',e=>{if(drag)updateJoy(e);if(started&&!drag&&e.pointerType==='touch'){}});
-window.addEventListener('pointerup',()=>{drag=false;move.x=move.y=0;$('knob').style.transform='translate(0,0)'});
-function updateJoy(e){
- let r=$('joy').getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
- let dx=e.clientX-cx,dy=e.clientY-cy,dist=Math.min(48,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
- let kx=Math.cos(a)*dist,ky=Math.sin(a)*dist;$('knob').style.transform=`translate(${kx}px,${ky}px)`;
- move.x=kx/48;move.y=-ky/48;
-}
-window.addEventListener('pointerdown',e=>{if(e.target.id==='game'||e.target.tagName==='CANVAS'){drag=false;lastX=e.clientX;lastY=e.clientY}});
-window.addEventListener('pointermove',e=>{
- if(!started||drag)return;
- if(e.pointerType==='mouse'||e.pointerType==='touch'){
-   if(e.buttons){let dx=e.clientX-lastX,dy=e.clientY-lastY;player.yaw-=dx*.006;player.pitch=Math.max(-1.1,Math.min(1.1,player.pitch-dy*.004));}
-   lastX=e.clientX;lastY=e.clientY;
- }
-});
-window.addEventListener('keydown',e=>{
- if(e.key==='w'||e.key==='ArrowUp')move.y=1;if(e.key==='s'||e.key==='ArrowDown')move.y=-1;
- if(e.key==='a'||e.key==='ArrowLeft')move.x=-1;if(e.key==='d'||e.key==='ArrowRight')move.x=1;
- if(e.code==='Space')shoot();
-});
-window.addEventListener('keyup',e=>{
- if('ws'.includes(e.key)||e.key.includes('ArrowUp')||e.key.includes('ArrowDown'))move.y=0;
- if('ad'.includes(e.key)||e.key.includes('ArrowLeft')||e.key.includes('ArrowRight'))move.x=0;
-});
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-init();
-</script>
+        <!-- หน้าจอเลือกเพื่อน -->
+        <div id="main-screen">
+            <div class="welcome-text" id="welcome-msg">ยินดีต้อนรับ!</div>
+            <p>เลือกชื่อเพื่อนที่คุณอยากแอบส่องความจริง:</p>
+            
+            <div class="friends-grid">
+                <div class="friend-card" onclick="showRoast('อ้อต')">
+                    <h3>💎 อ้อต</h3>
+                    <small style="color: #a4b0be;">ตัวมารดาแก๊ง</small>
+                </div>
+                <div class="friend-card" onclick="showRoast('แตม')">
+                    <h3>🥟 แตม</h3>
+                    <small style="color: #a4b0be;">สายฮาปากหมา</small>
+                </div>
+                <div class="friend-card" onclick="showRoast('บีม')">
+                    <h3>🎨 บีม</h3>
+                    <small style="color: #a4b0be;">นักวาดทรงบอลลิ่ง</small>
+                </div>
+                <div class="friend-card" onclick="showRoast('นุ่น')">
+                    <h3>🦷 นุ่น</h3>
+                    <small style="color: #a4b0be;">ตะเกียบพูดมาก</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- หน้าต่างแสดงข้อความ (Modal) -->
+    <div id="message-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">หัวข้อ</h2>
+            <p id="modal-text">ข้อความ...</p>
+            <button class="close-btn" onclick="closeModal()">ปิดหน้าต่าง ❌</button>
+        </div>
+    </div>
+
+    <script>
+        let userName = "";
+
+        const roastData = {
+            "อ้อต": {
+                title: "💎 ความจริงของ 'อ้อต'",
+                text: "อ้อตถึงมึง จะแอ๊บสวย แรดนิดนึง แต่มึงก็ฉลาดเรียนเก่ง มึงเองก็มีน้ำใจ มึงเป็นคนดีมากๆ อันนี้กูพูดจริงๆ (🦷แซก)"
+            },
+            "แตม": {
+                title: "🥟 ความจริงของ 'แตม'",
+                text: "แตม ถึงมึงจะอ้วน คอดำชอบนินทาเรื่องชาวบ้าน แต่มึงก็เป็นคนนึงที่รักเพื่อนถึงจะปากหมาไปหน่อย แต่โดยรวมมึงก็ไม่ได้แย่ มึงเป็นคนตลก ทำให้ทุกคนมีความสุขได้"
+            },
+            "บีม": {
+                title: "🎨 ความจริงของ 'บีม'",
+                text: "บีมถึงแม้มึงจะหน้ากลมเหมือนบอลลิ่งชอบวาดอนิเมะปัญญาอ่อน ชอบกรก็เถอะ แต่มึงก็... กุนึกข้อดีไม่ออกไว้คราวหลัง"
+            },
+            "นุ่น": {
+                title: "🦷 ความจริงของ 'นุ่น'",
+                text: "นุ่นถึงแม้ฟันมึงจะทะเลาะกันบ่อยครั้ง อย่างน้อยเองก็ไม่ได้มีฟันที่ทะเลาะกันคนเดียวนะ ยังมีเพื่อนอีกคนนึง มึงน่าจะรู้ ถึงมึงจะผอมเป็นตะเกียบ ขี่บ่นพูดมาก แต่มึงก็แรงเยอะดึงผมอีแตมที วิคแทบหลุด แต่มึงก็มีน้ำใจมาก ซื้อขนมมาทีไรเรียกเพื่อนมากิน เพราะตัวเองกินไม่ได้ ติดร่องฟัน"
+            }
+        };
+
+        function enterApp() {
+            const input = document.getElementById('username-input').value.trim();
+            if (input === "") {
+                alert("กรุณากรอกชื่อก่อนเข้าสู่ระบบครับ!");
+                return;
+            }
+            userName = input;
+            document.getElementById('welcome-msg').innerText = `ยินดีต้อนรับคุณ [ ${userName} ] เข้าสู่แก๊ง! 🎉`;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+        }
+
+        function showRoast(friendName) {
+            const data = roastData[friendName];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-text').innerText = data.text;
+            document.getElementById('message-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('message-modal').style.display = 'none';
+        }
+    </script>
 </body>
-</html>
+  </html>
+  
